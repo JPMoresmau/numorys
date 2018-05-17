@@ -1,0 +1,14 @@
+### Maven template
+**/target/
+
+## Idea files
+/.idea
+*.iml
+
+
+### Eclipse files
+**/.classpath
+**/.project
+**/.settings
+/.metadata
+/.recommenders

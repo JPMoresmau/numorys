@@ -1,0 +1,8 @@
+module demo1
+
+main : Int32
+main = 42
+
+data Demo = Enum | Wrapper Int32 | Record {one : Int32, two : Int32}
+
+
