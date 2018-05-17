@@ -25,8 +25,9 @@ public class Generator {
 			if (!f.getName().startsWith("_")) {
 				wm.getExports().add(new WatFunctionExport(f.getName(), name));
 			}
+			Type type=f.getSignature().getType();
 			
-			List<Type> types=f.getSignature().getParameterTypes();
+			List<Type> types=type.getComponents();
 			int cnt=types.size();
 			for (Type t:types) {
 				String tn=getTypeName(gs, t);

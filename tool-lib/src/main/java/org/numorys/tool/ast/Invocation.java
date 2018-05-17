@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Invocation extends Expression {
 	
 	public Invocation() {
@@ -55,4 +57,13 @@ public class Invocation extends Expression {
 		}*/
 	}
 
+	@JsonIgnore
+	public Expression getCallExpression() {
+		return expressions.get(0);
+	}
+	
+	@JsonIgnore
+	public List<Expression> getParametersExpressions(){
+		return expressions.subList(1, expressions.size());
+	}
 }

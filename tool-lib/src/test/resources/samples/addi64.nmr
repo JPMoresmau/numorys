@@ -1,0 +1,7 @@
+module add
+
+add : Int64 -> Int64 -> Int64
+add a b = a + b
+
+main : Int64
+main = add 1 2

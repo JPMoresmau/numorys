@@ -67,7 +67,7 @@ public class ParseTest {
 			assertEquals(1,ns.size());
 			ASTNode n0=ns.get(0);
 			assertTrue(n0 instanceof Module);
-			assertEquals(expected, n0);
+			assertEquals(expected.toString(), n0.toString());
 			
 			
 			

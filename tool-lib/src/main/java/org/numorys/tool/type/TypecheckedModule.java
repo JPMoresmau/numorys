@@ -18,7 +18,7 @@ public class TypecheckedModule extends ASTItem {
 
 	public TypecheckedModule(Module module) {
 		super();
-		this.module = (Module)module.clone();
+		this.module = module;
 	}
 
 	private Module module;

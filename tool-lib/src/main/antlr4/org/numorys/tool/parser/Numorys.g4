@@ -1,10 +1,10 @@
 grammar Numorys;
 
-module: MODULE ID NEWLINE* declaration* EOF;
+module: MODULE ID declaration* EOF;
 
 declaration: signature | binding;
 
-signature: function COLON type (ARROW type)*;
+signature: function COLON type;
 
 binding: function var* EQUALS statement* expr+;
 
@@ -19,7 +19,16 @@ expr:
 
 function: ID | INFIX;
 
-type: ID;
+type: 
+	(  bracket_type
+	| simple_type )
+	(ARROW (  bracket_type
+		| simple_type )
+		)*
+	;
+
+bracket_type: BRACKET_OPEN type BRACKET_CLOSE;
+simple_type: ID;
 
 var: ID;
 
@@ -51,4 +60,4 @@ fragment DIGIT : [0-9] ;
 
 WS : [ \t\n\r]+ -> skip ;
 
-INFIX: ~[0-9a-zA-Z\u0080-\u00FF_ \t\n\r]*;
+INFIX: ~[0-9a-zA-Z\u0080-\u00FF_ \t\n\r]+;

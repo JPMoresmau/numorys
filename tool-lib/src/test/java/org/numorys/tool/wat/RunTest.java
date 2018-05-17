@@ -16,7 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -49,7 +48,7 @@ public class RunTest {
 			Generator gen=new Generator();
 			WatModule wm=gen.generate(tcm);
 			assertNotNull(wm);
-			
+			System.out.println(tcm.toString());
 			try (InputStream isProps=ParseTest.class.getResourceAsStream("test.properties")){
 				
 				Properties p=new Properties();

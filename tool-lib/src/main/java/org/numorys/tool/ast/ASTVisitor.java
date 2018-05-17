@@ -41,7 +41,11 @@ public abstract class ASTVisitor {
 		
 	}
 	
-	public void visitType(Type t) {
+	public void visitSimpleType(SimpleType t) {
+		
+	}
+	
+	public void visitCompoundType(CompoundType t) {
 		
 	}
 	

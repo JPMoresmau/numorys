@@ -35,6 +35,14 @@ public abstract class WatInstruction extends WatItem {
 	
 	}
 	
+	public static class WatI64Add extends WatInstruction {
+		@Override
+		public void toString(WatWriter sb) {
+			sb.append("i64.add");
+		}
+	
+	}
+	
 	public static class WatI32Const extends WatInstruction {
 		private String value;
 		
@@ -46,6 +54,22 @@ public abstract class WatInstruction extends WatItem {
 		@Override
 		public void toString(WatWriter sb) {
 			sb.append("i32.const ");
+			sb.append(value);
+			
+		}
+	}
+	
+	public static class WatI64Const extends WatInstruction {
+		private String value;
+		
+		public WatI64Const(String value) {
+			super();
+			this.value = value;
+		}
+
+		@Override
+		public void toString(WatWriter sb) {
+			sb.append("i64.const ");
 			sb.append(value);
 			
 		}

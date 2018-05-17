@@ -3,12 +3,15 @@ package org.numorys.tool.wat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.antlr.v4.runtime.misc.Pair;
 import org.numorys.tool.ast.ASTVisitor;
 import org.numorys.tool.ast.Binding;
+import org.numorys.tool.ast.CompoundType;
 import org.numorys.tool.ast.Expression;
 import org.numorys.tool.ast.Invocation;
 import org.numorys.tool.ast.Name;
 import org.numorys.tool.ast.Number;
+import org.numorys.tool.ast.SimpleType;
 import org.numorys.tool.ast.Statement;
 import org.numorys.tool.ast.Type;
 
@@ -17,7 +20,7 @@ public class GeneratorState extends ASTVisitor {
 	
 	private Map<String, WatFunction> watFunctions=new HashMap<>();
 	
-	private Map<String, WatInstruction> watInstructions=new HashMap<>();
+	private Map<Pair<String,Type>, WatInstruction> watInstructions=new HashMap<>();
 	
 	private Map<Type, String> type2Wat=new HashMap<>();
 	
@@ -34,10 +37,12 @@ public class GeneratorState extends ASTVisitor {
 	}
 
 	public GeneratorState() {
-		type2Wat.put(Type.INT_32, "i32");
-		type2Wat.put(Type.INT_64, "i64");
+		type2Wat.put(SimpleType.INT_32, "i32");
+		type2Wat.put(SimpleType.INT_64, "i64");
 		
-		watInstructions.put("+", new WatInstruction.WatI32Add());
+		watInstructions.put(new Pair<>("+",new CompoundType(SimpleType.INT_32,SimpleType.INT_32,SimpleType.INT_32)), new WatInstruction.WatI32Add());
+		watInstructions.put(new Pair<>("+",new CompoundType(SimpleType.INT_64,SimpleType.INT_64,SimpleType.INT_64)), new WatInstruction.WatI64Add());
+
 	}
 
 	public Map<String, String> getFunction2Wat() {
@@ -52,7 +57,7 @@ public class GeneratorState extends ASTVisitor {
 		return watFunctions;
 	}
 	
-	public Map<String, WatInstruction> getWatInstructions() {
+	public Map<Pair<String,Type>, WatInstruction> getWatInstructions() {
 		return watInstructions;
 	}
 	
@@ -72,7 +77,18 @@ public class GeneratorState extends ASTVisitor {
 	
 	@Override
 	public void visitNumber(Number n) {
-		currentFunction.getInstructions().add(new WatInstruction.WatI32Const(n.getValue()));		
+		if (n.getType()!=null) {
+			WatInstruction wi=null;
+			
+			if (n.getType().equals(SimpleType.INT_32)) {
+				wi=new WatInstruction.WatI32Const(n.getValue());
+			} else if (n.getType().equals(SimpleType.INT_64)) {
+				wi=new WatInstruction.WatI64Const(n.getValue());
+			}
+			if (wi!=null) {
+				currentFunction.getInstructions().add(wi);
+			}
+		}
 	}
 	
 	@Override
@@ -85,7 +101,7 @@ public class GeneratorState extends ASTVisitor {
 			if (wat!=null) {
 				currentFunction.getInstructions().add(new WatInstruction.WatCall(wat));
 			} else {
-				WatInstruction wi=watInstructions.get(n.getName());
+				WatInstruction wi=watInstructions.get(new Pair<>(n.getName(),n.getType()));
 				if (wi!=null) {
 					currentFunction.getInstructions().add(wi);
 				}
@@ -96,14 +112,9 @@ public class GeneratorState extends ASTVisitor {
 	
 	@Override
 	public void visitInvocation(Invocation i) {
-		Expression callTarget=null;
-		for(Expression e:i.getExpressions()) {
-			if (callTarget==null) {
-				callTarget=e;
-			} else {
-				e.accept(this);
-			}
+		for(Expression e:i.getParametersExpressions()) {
+			e.accept(this);
 		}
-		callTarget.accept(this);
+		i.getCallExpression().accept(this);
 	}
 }

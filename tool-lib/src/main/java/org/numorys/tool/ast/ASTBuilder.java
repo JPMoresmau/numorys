@@ -12,6 +12,7 @@ import org.numorys.tool.parser.NumorysParser.ExprContext;
 import org.numorys.tool.parser.NumorysParser.ModuleContext;
 import org.numorys.tool.parser.NumorysParser.NumContext;
 import org.numorys.tool.parser.NumorysParser.SignatureContext;
+import org.numorys.tool.parser.NumorysParser.Simple_typeContext;
 import org.numorys.tool.parser.NumorysParser.StatementContext;
 import org.numorys.tool.parser.NumorysParser.TypeContext;
 import org.numorys.tool.parser.NumorysParser.VarContext;
@@ -132,8 +133,19 @@ public class ASTBuilder extends NumorysBaseVisitor<List<ASTNode>> {
 	
 	@Override
 	public List<ASTNode> visitType(TypeContext ctx) {
+		List<ASTNode> result=visitChildren(ctx);
+		if (result.size()==1) {
+			return result;
+		}
+		CompoundType ct=new CompoundType();
+		ct.addChildren(result);
+		return singleResult(ct);
+	}
+	
+	@Override
+	public List<ASTNode> visitSimple_type(Simple_typeContext ctx) {
 		String type=ctx.getText();
-		return singleResult(Type.fromString(type));
+		return singleResult(new SimpleType(type));
 	}
 	
 	@Override

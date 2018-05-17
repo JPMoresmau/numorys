@@ -1,14 +1,9 @@
 package org.numorys.tool.type;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.numorys.tool.ast.Binding;
 import org.numorys.tool.ast.Function;
 import org.numorys.tool.ast.Module;
-import org.numorys.tool.ast.Name;
 import org.numorys.tool.ast.Signature;
-import org.numorys.tool.ast.Type;
 
 public class TypeChecker {
 
@@ -61,19 +56,11 @@ public class TypeChecker {
 	
 	private void typeCheck(TypecheckedModule tm,ModuleState ms) {
 		for (Function f:tm.getFunctions()) {
-			List<Type> types=null;
-			if (f.getSignature()!=null) {
-				types=f.getSignature().getParameterTypes();
-				for(Binding b:f.getBindings()) {
-					Iterator<Type> it=types.iterator();
-					for (Name n:b.getParameters()) {
-						n.getTypes().add(it.next());
-					}
-					while (it.hasNext()) {
-						b.getExpression().getTypes().add(it.next());
-					}
-				}
+			for(Binding b:f.getBindings()) {
+				BindingChecker bc=new BindingChecker(ms, tm, f, b);
+				b.accept(bc);
 			}
+			
 		}
 	}
 	
