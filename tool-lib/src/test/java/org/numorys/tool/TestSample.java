@@ -104,14 +104,22 @@ public class TestSample {
 	}
 	
 	private static TestSample addI32() {
-		return add("addi32.nmr",SimpleType.INT_32,"i32");
+		return add("addi32.nmr",SimpleType.INT_32,"i32","3");
 	}
 	
 	private static TestSample addI64() {
-		return add("addi64.nmr",SimpleType.INT_64,"i64");
+		return add("addi64.nmr",SimpleType.INT_64,"i64","3");
 	}
 	
-	private static TestSample add(String resource,Type t,String watType) {
+	private static TestSample addF32() {
+		return add("addf32.nmr",SimpleType.FLOAT_32,"f32","3.000000");
+	}
+	
+	private static TestSample addF64() {
+		return add("addf64.nmr",SimpleType.FLOAT_64,"f64","3.000000");
+	}
+	
+	private static TestSample add(String resource,Type t,String watType,String result) {
 		
 		TestSample ts=new TestSample("/samples/"+resource);
 		
@@ -192,7 +200,7 @@ public class TestSample {
 			    + ")").replaceAll("TYPE", watType)
 				);
 		
-		ts.setMainResult(watType+":3");
+		ts.setMainResult(watType+":"+result);
 		
 		return ts;
 	}
@@ -200,7 +208,7 @@ public class TestSample {
 	
 	
 	public static List<TestSample> getTestSamples() {
-		return Arrays.asList(empty(),addI32(),addI64());
+		return Arrays.asList(empty(),addI32(),addI64(),addF32(),addF64());
 	}
 	
 	public static List<TestSample> getTestSamplesWithResult() {

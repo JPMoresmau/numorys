@@ -26,52 +26,65 @@ public abstract class WatInstruction extends WatItem {
 		
 	}
 	
-	
-	public static class WatI32Add extends WatInstruction {
+	public static class WatSimpleInstruction extends WatInstruction {
+		private String instruction;
+		
+		public WatSimpleInstruction(String instruction) {
+			super();
+			this.instruction = instruction;
+		}
+
 		@Override
 		public void toString(WatWriter sb) {
-			sb.append("i32.add");
+			sb.append(instruction);
 		}
-	
 	}
 	
-	public static class WatI64Add extends WatInstruction {
-		@Override
-		public void toString(WatWriter sb) {
-			sb.append("i64.add");
-		}
-	
-	}
-	
-	public static class WatI32Const extends WatInstruction {
+	public abstract static class WatStringValueInstruction extends WatInstruction {
+		private String prefix;
 		private String value;
 		
+		public WatStringValueInstruction(String prefix, String value) {
+			super();
+			this.prefix = prefix;
+			this.value = value;
+		}
+		
+		@Override
+		public void toString(WatWriter sb) {
+			sb.append(prefix);
+			sb.append(value);
+		}
+		
+	}
+		
+	public static WatSimpleInstruction WatI32Add = new WatSimpleInstruction("i32.add");
+	public static WatSimpleInstruction WatI64Add = new WatSimpleInstruction("i64.add");
+	public static WatSimpleInstruction WatF32Add = new WatSimpleInstruction("f32.add");
+	public static WatSimpleInstruction WatF64Add = new WatSimpleInstruction("f64.add");
+	
+	
+	public static class WatI32Const extends WatStringValueInstruction {
 		public WatI32Const(String value) {
-			super();
-			this.value = value;
-		}
-
-		@Override
-		public void toString(WatWriter sb) {
-			sb.append("i32.const ");
-			sb.append(value);
-			
+			super("i32.const ",value);
 		}
 	}
 	
-	public static class WatI64Const extends WatInstruction {
-		private String value;
-		
+	public static class WatI64Const extends WatStringValueInstruction {
 		public WatI64Const(String value) {
-			super();
-			this.value = value;
+			super("i64.const ",value);
 		}
-
-		@Override
-		public void toString(WatWriter sb) {
-			sb.append("i64.const ");
-			sb.append(value);
-			
+	}
+	
+	public static class WatF32Const extends WatStringValueInstruction {
+		public WatF32Const(String value) {
+			super("f32.const ",value);
+		}
+	}
+	
+	public static class WatF64Const extends WatStringValueInstruction {
+		public WatF64Const(String value) {
+			super("f64.const ",value);
 		}
 	}
 	

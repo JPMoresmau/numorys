@@ -14,6 +14,7 @@ import org.numorys.tool.ast.Number;
 import org.numorys.tool.ast.SimpleType;
 import org.numorys.tool.ast.Statement;
 import org.numorys.tool.ast.Type;
+import org.numorys.tool.wat.WatInstruction.WatStringValueInstruction;
 
 public class GeneratorState extends ASTVisitor {
 	private Map<String, String> function2Wat=new HashMap<>();
@@ -23,6 +24,8 @@ public class GeneratorState extends ASTVisitor {
 	private Map<Pair<String,Type>, WatInstruction> watInstructions=new HashMap<>();
 	
 	private Map<Type, String> type2Wat=new HashMap<>();
+	
+	private Map<Type, Class<? extends WatStringValueInstruction>> type2Const=new HashMap<>();
 	
 	private Map<String, Integer> bindingLocals = new HashMap<>();
 	
@@ -39,9 +42,19 @@ public class GeneratorState extends ASTVisitor {
 	public GeneratorState() {
 		type2Wat.put(SimpleType.INT_32, "i32");
 		type2Wat.put(SimpleType.INT_64, "i64");
+		type2Wat.put(SimpleType.FLOAT_32, "f32");
+		type2Wat.put(SimpleType.FLOAT_64, "f64");
+
+		type2Const.put(SimpleType.INT_32, WatInstruction.WatI32Const.class);
+		type2Const.put(SimpleType.INT_64, WatInstruction.WatI64Const.class);
+		type2Const.put(SimpleType.FLOAT_32, WatInstruction.WatF32Const.class);
+		type2Const.put(SimpleType.FLOAT_64, WatInstruction.WatF64Const.class);
+			
 		
-		watInstructions.put(new Pair<>("+",new CompoundType(SimpleType.INT_32,SimpleType.INT_32,SimpleType.INT_32)), new WatInstruction.WatI32Add());
-		watInstructions.put(new Pair<>("+",new CompoundType(SimpleType.INT_64,SimpleType.INT_64,SimpleType.INT_64)), new WatInstruction.WatI64Add());
+		watInstructions.put(new Pair<>("+",new CompoundType(SimpleType.INT_32,SimpleType.INT_32,SimpleType.INT_32)), WatInstruction.WatI32Add);
+		watInstructions.put(new Pair<>("+",new CompoundType(SimpleType.INT_64,SimpleType.INT_64,SimpleType.INT_64)), WatInstruction.WatI64Add);
+		watInstructions.put(new Pair<>("+",new CompoundType(SimpleType.FLOAT_32,SimpleType.FLOAT_32,SimpleType.FLOAT_32)), WatInstruction.WatF32Add);
+		watInstructions.put(new Pair<>("+",new CompoundType(SimpleType.FLOAT_64,SimpleType.FLOAT_64,SimpleType.FLOAT_64)), WatInstruction.WatF64Add);
 
 	}
 
@@ -78,16 +91,16 @@ public class GeneratorState extends ASTVisitor {
 	@Override
 	public void visitNumber(Number n) {
 		if (n.getType()!=null) {
-			WatInstruction wi=null;
+			Class<? extends WatStringValueInstruction> wiC=type2Const.get(n.getType());
+			if (wiC!=null) {
+				try {
+					WatStringValueInstruction wi=wiC.getConstructor(String.class).newInstance(n.getValue());
+					currentFunction.getInstructions().add(wi);
+				} catch (Exception e) {
+					throw new GenerationException("Cannot create const instruction", e);
+				}
+			}
 			
-			if (n.getType().equals(SimpleType.INT_32)) {
-				wi=new WatInstruction.WatI32Const(n.getValue());
-			} else if (n.getType().equals(SimpleType.INT_64)) {
-				wi=new WatInstruction.WatI64Const(n.getValue());
-			}
-			if (wi!=null) {
-				currentFunction.getInstructions().add(wi);
-			}
 		}
 	}
 	
