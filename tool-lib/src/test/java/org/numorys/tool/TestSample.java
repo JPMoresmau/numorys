@@ -97,7 +97,7 @@ public class TestSample {
 
 	private static TestSample empty() {
 		TestSample ts=new TestSample("/samples/empty.nmr");
-		ts.setModule(new Module("empty"));
+		ts.setModule(new Module("Empty"));
 		ts.setTypecheckedModule(new TypecheckedModule(ts.getModule()));
 		ts.setWat("(module\n)");
 		return ts;
@@ -123,7 +123,7 @@ public class TestSample {
 		
 		TestSample ts=new TestSample("/samples/"+resource);
 		
-		Module m=new Module("add");
+		Module m=new Module("Add");
 		Signature fsAdd=new Signature("add");
 		fsAdd.setType(new CompoundType(t,t,t));
 		m.getSignatures().add(fsAdd);

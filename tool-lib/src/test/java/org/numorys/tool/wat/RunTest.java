@@ -48,7 +48,7 @@ public class RunTest {
 			Generator gen=new Generator();
 			WatModule wm=gen.generate(tcm);
 			assertNotNull(wm);
-			System.out.println(tcm.toString());
+			//System.out.println(tcm.toString());
 			try (InputStream isProps=ParseTest.class.getResourceAsStream("test.properties")){
 				
 				Properties p=new Properties();

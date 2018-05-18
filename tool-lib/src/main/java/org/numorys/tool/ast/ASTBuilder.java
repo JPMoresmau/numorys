@@ -21,22 +21,54 @@ public class ASTBuilder extends NumorysBaseVisitor<List<ASTNode>> {
 
 	@Override
 	public List<ASTNode> visitModule(ModuleContext ctx) {
-		Module m=new Module(ctx.getChild(1).getText());
+		String name=checkModuleName(ctx.getChild(1));
+		Module m=new Module(name);
 		m.addChildren(visitChildren(ctx));
 		
 		return singleResult(m);
 	}
 	
+	private String checkModuleName(ParseTree c) {
+		String name=c.getText();
+		char first=name.charAt(0);
+		if (first=='_') {
+			if (name.length()==1) {
+				throw new ASTException("Module names cannot be a single underscore",c.getSourceInterval());
+			}
+			first=name.charAt(1);
+		}
+		if (!Character.isUpperCase(first)) {
+			throw new ASTException("Module names should start with an upper case letter or a underscore and a upper case letter",c.getSourceInterval());
+		}
+		return name;
+	}
+	
+	private String checkFunctionName(ParseTree c) {
+		String name=c.getText();
+		char first=name.charAt(0);
+		if (first=='_') {
+			if (name.length()==1) {
+				throw new ASTException("Function names cannot be a single underscore",c.getSourceInterval());
+			}
+			first=name.charAt(1);
+		}
+		if (!Character.isLowerCase(first)) {
+			throw new ASTException("Function names should start with an lower case letter or a underscore and a lower case letter",c.getSourceInterval());
+			
+		}
+		return name;
+	}
+	
 	@Override
 	public List<ASTNode> visitSignature(SignatureContext ctx) {
-		Signature fs=new Signature(ctx.getChild(0).getText());
+		Signature fs=new Signature(checkFunctionName(ctx.getChild(0)));
 		fs.addChildren(visitChildren(ctx));
 		return singleResult(fs);
 	}
 	
 	@Override
 	public List<ASTNode> visitBinding(BindingContext ctx) {
-		Binding b=new Binding(ctx.getChild(0).getText());
+		Binding b=new Binding(checkFunctionName(ctx.getChild(0)));
 		int n = ctx.getChildCount();
 		List<ASTNode> result = defaultResult();
 		
@@ -56,11 +88,11 @@ public class ASTBuilder extends NumorysBaseVisitor<List<ASTNode>> {
 			List<ASTNode> childResult = c.accept(this);
 			if (param) {
 				if (childResult.size()!=1) {
-					throw new ASTException("Binding parameters should be single expressions");
+					throw new ASTException("Binding parameters should be single expressions",c.getSourceInterval());
 				}
 				for (ASTNode cn:childResult) {
 					if (!(cn instanceof Name)) {
-						throw new ASTException("Binding parameters should be names");
+						throw new ASTException("Binding parameters should be names",c.getSourceInterval());
 					}
 					b.getParameters().add((Name)cn);
 				}
@@ -103,7 +135,7 @@ public class ASTBuilder extends NumorysBaseVisitor<List<ASTNode>> {
 				Invocation i=new Invocation();
 				for (ASTNode cn:result) {
 					if (!(cn instanceof Expression)) {
-						throw new ASTException("Bracketed expression should contain expressions only");
+						throw new ASTException("Bracketed expression should contain expressions only",ctx.getSourceInterval());
 					}
 					i.getExpressions().add((Expression)cn);
 				}
@@ -113,13 +145,13 @@ public class ASTBuilder extends NumorysBaseVisitor<List<ASTNode>> {
 		} else {
 			List<ASTNode> result=visitChildren(ctx);
 			if (result.size()!=2) {
-				throw new ASTException("Infix expression should contain throw children");
+				throw new ASTException("Infix expression should contain throw children",ctx.getSourceInterval());
 			}
 			Invocation i=new Invocation();
 			i.getExpressions().add(new Name(ctx.getChild(1).getText()));
 			for (ASTNode cn:result) {
 				if (!(cn instanceof Expression)) {
-					throw new ASTException("Infix expression should contain expressions only");
+					throw new ASTException("Infix expression should contain expressions only",ctx.getSourceInterval());
 				}
 				i.getExpressions().add((Expression)cn);
 			}

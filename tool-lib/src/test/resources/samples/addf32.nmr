@@ -1,4 +1,4 @@
-module add
+module Add
 
 add : Float32 -> Float32 -> Float32
 add a b = a + b
