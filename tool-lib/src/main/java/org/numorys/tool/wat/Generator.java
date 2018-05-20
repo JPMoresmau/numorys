@@ -62,10 +62,15 @@ public class Generator {
 	}
 	
 	private void generateInstructions(GeneratorState gs,Function f,WatFunction wf) {
-		gs.setCurrentFunction(wf);
+		gs.getBlocks().push(wf);
 		for (Binding b:f.getBindings()) {
 			b.accept(gs);
 		}
-		gs.setCurrentFunction(null);
+		while (gs.getBlocks().size()>1) {
+			gs.getBlocks().pop();
+			gs.getBlocks().peek().addInstruction(WatInstruction.WatEnd);
+		}
+		gs.getBlocks().pop();
+		
 	}
 }

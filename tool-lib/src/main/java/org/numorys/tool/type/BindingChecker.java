@@ -51,9 +51,11 @@ public class BindingChecker extends ASTVisitor {
 		if (function.getSignature()!=null) {
 			types=function.getSignature().getType().getComponents();
 			Iterator<Type> it=types.iterator();
-			for (Name n:b.getParameters()) {
-				n.setType(it.next());
-				typeByName.put(n.getName(), n.getType());
+			for (Expression e:b.getParameters()) {
+				e.setType(it.next());
+				if (e instanceof Name) {
+					typeByName.put(((Name)e).getName(), e.getType());
+				}
 			}
 			List<Type> remaining=new LinkedList<>();
 			while (it.hasNext()) {
@@ -89,7 +91,9 @@ public class BindingChecker extends ASTVisitor {
 
 	@Override
 	public void visitNumber(Number n) {
-		unresolved.put(n,Boolean.TRUE);
+		if (n.getType()==null) {
+			unresolved.put(n,Boolean.TRUE);
+		}
 	}
 	
 	@Override
@@ -107,6 +111,16 @@ public class BindingChecker extends ASTVisitor {
 				e.setType(it.next());
 				unresolved.remove(e);
 			}
+			List<Type> remaining=new LinkedList<>();
+			while (it.hasNext()) {
+				remaining.add(it.next());
+			}
+			if (remaining.size()==1) {
+				i.setType(remaining.get(0));
+			} else {
+				i.setType(new CompoundType(remaining));
+			}
+			unresolved.remove(i);
 		}
 	}
 	

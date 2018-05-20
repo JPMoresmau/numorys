@@ -5,14 +5,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
@@ -22,6 +19,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.numorys.tool.TestSample;
+import org.numorys.tool.TestUtils;
 import org.numorys.tool.ast.Module;
 import org.numorys.tool.ast.ModuleParser;
 import org.numorys.tool.parser.ParseTest;
@@ -61,8 +59,8 @@ public class RunTest {
 				Path i=f.resolve("input.wat");
 				Files.write(i, wm.toString().getBytes(StandardCharsets.UTF_8));
 				Path o=f.resolve("input.wasm");
-				run(wabtPath+"/wat2wasm",i.toFile().getAbsolutePath(),"-o",o.toFile().getAbsolutePath());
-				List<String> outputs=run(wabtPath+"/wasm-interp",o.toFile().getAbsolutePath(),"--run-all-exports");
+				TestUtils.run(wabtPath+"/wat2wasm",i.toFile().getAbsolutePath(),"-o",o.toFile().getAbsolutePath());
+				List<String> outputs=TestUtils.run(wabtPath+"/wasm-interp",o.toFile().getAbsolutePath(),"--run-all-exports");
 				
 				i.toFile().delete();
 				o.toFile().delete();
@@ -85,35 +83,7 @@ public class RunTest {
 		}
 	}
 	
-	public static List<String> run(String...command) throws IOException {
-		ProcessBuilder pb=new ProcessBuilder(command);
-		pb.redirectErrorStream(true);
-		Process p=pb.start();
-		
-		List<String> output=readStream(p.getInputStream());
-		try {
-			int code=p.waitFor();
-			if (code!=0) {
-				fail("Error while running:"+code+"\n"+output.toString());
-			}
-		} catch (InterruptedException ie) {
-			ie.printStackTrace();
-			fail(ie.getMessage());
-		}
-		return output;
-	}
 	
-	public static List<String> readStream(InputStream is) throws IOException {
-		try(BufferedReader reader = 
-                new BufferedReader(new InputStreamReader(is))){
-			List<String> lines=new LinkedList<>();
-			String line = null;
-			while ( (line = reader.readLine()) != null) {
-			   lines.add(line);
-			}
-			return lines;
-		}
-	}
 	
 
 	@Parameters(name="{0}")

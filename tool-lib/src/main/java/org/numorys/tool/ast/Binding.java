@@ -27,9 +27,9 @@ public class Binding extends ASTNode {
 		this.name = name;
 	}
 	
-	private List<Name> parameters=new LinkedList<>();
+	private List<Expression> parameters=new LinkedList<>();
 	
-	public List<Name> getParameters() {
+	public List<Expression> getParameters() {
 		return parameters;
 	}
 	

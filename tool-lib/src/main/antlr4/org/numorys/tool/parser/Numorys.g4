@@ -1,18 +1,21 @@
 grammar Numorys;
 
-module: MODULE ID declaration* EOF;
+module: MODULE ID declaration* NEWLINE? EOF;
 
 declaration: signature | binding;
 
-signature: function COLON type;
+signature: NEWLINE function COLON type;
 
-binding: function var* EQUALS statement* expr+;
+binding: NEWLINE function param* EQUALS statement* expr;
 
-statement: var BIND expr+ SEMI;
+param: var | num;
+
+statement: NEWLINE WS var BIND expr+ SEMI;
 
 expr:
-      expr INFIX expr 
-	| BRACKET_OPEN expr+ BRACKET_CLOSE
+	 expr ((BRACKET_OPEN expr+ BRACKET_CLOSE) | var | num)+
+    | <assoc=right> expr INFIX expr 
+    | BRACKET_OPEN expr+ BRACKET_CLOSE
 	| var
 	| num
 	;
@@ -58,6 +61,8 @@ NUMBER : '-'? ('.' DIGIT+ | DIGIT+ ('.' DIGIT*)? ) ;
 
 fragment DIGIT : [0-9] ;
 
-WS : [ \t\n\r]+ -> skip ;
+NEWLINE : [\n\r]+;
+
+WS : [ \t]+ -> skip;
 
 INFIX: ~[0-9a-zA-Z\u0080-\u00FF_ \t\n\r]+;
