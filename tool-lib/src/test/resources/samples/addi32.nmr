@@ -1,7 +1,7 @@
 module Add
 
-add : Int32 -> Int32 -> Int32
+add :: Int32 -> Int32 -> Int32
 add a b = a + b
 
-main : Int32
+main :: Int32
 main = add 1 2

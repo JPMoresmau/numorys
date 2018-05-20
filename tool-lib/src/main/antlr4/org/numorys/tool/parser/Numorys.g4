@@ -4,7 +4,7 @@ module: MODULE ID declaration* NEWLINE? EOF;
 
 declaration: signature | binding;
 
-signature: NEWLINE function COLON type;
+signature: NEWLINE function DBL_COLON type;
 
 binding: NEWLINE function param* EQUALS statement* expr;
 
@@ -38,6 +38,8 @@ var: ID;
 num: NUMBER;
 
 MODULE: 'module';
+
+DBL_COLON: '::';
 
 COLON: ':';
 

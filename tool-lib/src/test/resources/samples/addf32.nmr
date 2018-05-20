@@ -1,7 +1,7 @@
 module Add
 
-add : Float32 -> Float32 -> Float32
+add :: Float32 -> Float32 -> Float32
 add a b = a + b
 
-main : Float32
+main :: Float32
 main = add 1 2

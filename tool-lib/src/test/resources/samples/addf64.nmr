@@ -1,7 +1,7 @@
 module Add
 
-add : Float64 -> Float64 -> Float64
+add :: Float64 -> Float64 -> Float64
 add a b = a + b
 
-main : Float64
+main :: Float64
 main = add 1 2
